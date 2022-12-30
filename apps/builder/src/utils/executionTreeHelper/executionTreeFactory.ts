@@ -22,7 +22,6 @@ import { RawTreeShape } from "@/utils/executionTreeHelper/interface"
 import {
   convertPathToString,
   extractReferencesFromScript,
-  getImmediateParentsOfPropertyPaths,
   isAction,
   isWidget,
 } from "@/utils/executionTreeHelper/utils"
@@ -182,14 +181,8 @@ export class ExecutionTreeFactory {
     let sortOrders: string[] = []
     let parents = cloneDeep(changes)
     let subSortOrderArray: string[]
-    while (true) {
-      subSortOrderArray = this.getEvaluationSortOrder(parents, inDependencyTree)
-      sortOrders = [...sortOrders, ...subSortOrderArray]
-      parents = getImmediateParentsOfPropertyPaths(subSortOrderArray)
-      if (parents.length <= 0) {
-        break
-      }
-    }
+    subSortOrderArray = this.getEvaluationSortOrder(parents, inDependencyTree)
+    sortOrders = [...sortOrders, ...subSortOrderArray]
     const sortOrderSet = new Set(sortOrders)
     const sortOrderPropertyPaths: string[] = []
     this.evalOrder.forEach((path) => {
@@ -267,13 +260,19 @@ export class ExecutionTreeFactory {
       }
     }
     const updatePaths = this.getUpdatePathFromDifferences(differences)
+
     let currentExecution = this.updateExecutionTreeByUpdatePaths(
       updatePaths,
       this.executedTree,
       currentRawTree,
     )
-
     const path = this.calcSubTreeSortOrder(differences, currentExecution)
+    currentExecution = this.updateExecutionTreeByUpdatePaths(
+      path,
+      currentExecution,
+      currentRawTree,
+    )
+
     const { evaluatedTree, errorTree, debuggerData } = this.executeTree(
       currentExecution,
       path,
@@ -297,7 +296,7 @@ export class ExecutionTreeFactory {
     const updatePaths: string[] = []
     for (const d of differences) {
       if (!Array.isArray(d.path) || d.path.length === 0) continue
-      updatePaths.push(d.path.join("."))
+      updatePaths.push(convertPathToString(d.path))
     }
     return updatePaths
   }

@@ -21,7 +21,7 @@ export type RawTreeDiff = {
 }
 
 const ignorePathsForEvalRegex = /.(\$dynamicAttrPaths|\$validationPaths)/
-const IMMEDIATE_PARENT_REGEX = /^(.*)(\..*|\[.*\])$/
+const IMMEDIATE_PARENT_REGEX = /^(.*)$/
 
 const isUninterestingChangeForDependencyUpdate = (path: string) => {
   return path.match(ignorePathsForEvalRegex)
