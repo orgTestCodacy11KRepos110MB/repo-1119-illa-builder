@@ -8,16 +8,13 @@ import {
   Divider,
   PaginationPreIcon,
   WarningCircleIcon,
-  useMessage,
 } from "@illa-design/react"
-import {
-  errorIconStyle,
-  errorMsgStyle,
-} from "@/page/App/components/Actions/ClickhouseConfigElement/style"
 import { HuggingFaceConfigElementProps } from "@/page/App/components/Actions/HuggingFaceConfigElement/interface"
 import {
   container,
   divider,
+  errorIconStyle,
+  errorMsgStyle,
   footerStyle,
   optionLabelStyle,
 } from "@/page/App/components/Actions/HuggingFaceConfigElement/style"
@@ -63,7 +60,7 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
     onActionConfigElementTest(
       data,
       {
-        baseUrl: data.baseUrl,
+        baseURL: data.baseURL,
         urlParams: data.urlParams,
         headers: data.headers,
         cookies: data.cookies,
@@ -136,7 +133,7 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
           title={t("editor.action.resource.restapi.label.base_url")}
           control={control}
           defaultValue={
-            resource?.content.baseUrl ??
+            resource?.content.baseURL ??
             "https://api-inference.huggingface.co/models/"
           }
           rules={[
@@ -148,14 +145,14 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
           placeholders={[
             t("editor.action.resource.db.placeholder.hugging_face_url"),
           ]}
-          name="baseUrl"
+          name="baseURL"
           tips={
             <>
-              {formState.errors.baseUrl ? (
+              {formState.errors.baseURL ? (
                 <div css={errorMsgStyle}>
                   <>
                     <WarningCircleIcon css={errorIconStyle} />
-                    {formState.errors.baseUrl.message}
+                    {formState.errors.baseURL.message}
                   </>
                 </div>
               ) : (
@@ -290,7 +287,7 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
 
         <ControlledElement
           title={t("editor.action.resource.db.label.bear_token")}
-          defaultValue={resource?.content.token ?? ""}
+          defaultValue={resource?.content?.authContent.token ?? ""}
           name="token"
           controlledType="password"
           control={control}
