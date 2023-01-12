@@ -9,19 +9,18 @@ import {
   PaginationPreIcon,
   WarningCircleIcon,
 } from "@illa-design/react"
+import {
+  errorIconStyle,
+  errorMsgStyle,
+} from "@/page/App/components/Actions/ClickhouseConfigElement/style"
 import { HuggingFaceConfigElementProps } from "@/page/App/components/Actions/HuggingFaceConfigElement/interface"
 import {
   container,
   divider,
-  errorIconStyle,
-  errorMsgStyle,
   footerStyle,
   optionLabelStyle,
 } from "@/page/App/components/Actions/HuggingFaceConfigElement/style"
-import {
-  onActionConfigElementSubmit,
-  onActionConfigElementTest,
-} from "@/page/App/components/Actions/api"
+import { onActionConfigElementSubmit } from "@/page/App/components/Actions/api"
 import { ControlledElement } from "@/page/App/components/ControlledElement"
 import { InputRecordEditor } from "@/page/App/components/InputRecordEditor"
 import { TextLink } from "@/page/User/components/TextLink"
@@ -36,7 +35,7 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
   const { onBack, onFinished, resourceId } = props
   const { t } = useTranslation()
 
-  const { control, handleSubmit, getValues, formState } = useForm({
+  const { control, handleSubmit, formState } = useForm({
     mode: "onChange",
     shouldUnregister: true,
   })
@@ -47,32 +46,11 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
   })
 
   const [saving, setSaving] = useState(false)
-  const [testLoading, setTestLoading] = useState(false)
-
   const handleURLValidate = useCallback(
     (value: string) =>
       isURL(value) ? true : t("editor.action.resource.error.invalid_url"),
     [t],
   )
-
-  const handleConnectionTest = useCallback(() => {
-    const data = getValues()
-    onActionConfigElementTest(
-      data,
-      {
-        baseURL: data.baseURL,
-        urlParams: data.urlParams,
-        headers: data.headers,
-        cookies: data.cookies,
-        authentication: "bearer",
-        authContent: {
-          token: data.token,
-        },
-      },
-      "huggingface",
-      setTestLoading,
-    )
-  }, [setTestLoading, getValues])
 
   const handleURLClick = (link: string) => window.open(link, "_blank")
 
@@ -313,15 +291,6 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
           {t("back")}
         </Button>
         <ButtonGroup spacing="8px">
-          <Button
-            colorScheme="gray"
-            loading={testLoading}
-            disabled={!formState.isValid}
-            type="button"
-            onClick={handleConnectionTest}
-          >
-            {t("editor.action.form.btn.test_connection")}
-          </Button>
           <Button
             colorScheme="techPurple"
             value="creating"
