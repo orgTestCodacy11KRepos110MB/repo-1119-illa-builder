@@ -16,6 +16,8 @@ import {
   docsItemContainerStyle,
   footerStyle,
   labelContainer,
+  labelStyle,
+  tipsStyle,
 } from "@/page/App/components/Actions/HuggingFaceConfigElement/style"
 import { onActionConfigElementSubmit } from "@/page/App/components/Actions/api"
 import { ControlledElement } from "@/page/App/components/ControlledElement"
@@ -39,7 +41,6 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
       (r) => r.resourceId === resourceId,
     ) as Resource<HuggingFaceResource>
   })
-
   const [saving, setSaving] = useState(false)
 
   const handleURLClick = (link: string) => window.open(link, "_blank")
@@ -68,7 +69,7 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
         <div css={docsItemContainerStyle}>
           <div css={labelContainer} />
           <div css={docContainerStyle}>
-            <span css={docItemStyle}>Learn more about Hugging Face: </span>
+            <span css={docItemStyle}>Learn more about Hugging Face:</span>
             <span
               css={docItemStyle}
               onClick={() =>
@@ -106,6 +107,8 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
           placeholders={[t("editor.action.resource.db.placeholder.name")]}
           name="resourceName"
           tips={t("editor.action.resource.restapi.tip.name")}
+          labelStyle={labelStyle}
+          tipsStyle={tipsStyle}
         />
 
         <ControlledElement
@@ -115,14 +118,12 @@ export const HuggingFaceConfigElement: FC<HuggingFaceConfigElementProps> = (
           controlledType="password"
           control={control}
           isRequired
-          tips={
-            <>
-              {getTransComponent(
-                "editor.action.resource.db.tip.bear_token",
-                "https://huggingface.co/settings/tokens",
-              )}
-            </>
-          }
+          tips={getTransComponent(
+            "editor.action.resource.db.tip.bear_token",
+            "https://huggingface.co/settings/tokens",
+          )}
+          labelStyle={labelStyle}
+          tipsStyle={tipsStyle}
         />
       </div>
       <div css={footerStyle}>
