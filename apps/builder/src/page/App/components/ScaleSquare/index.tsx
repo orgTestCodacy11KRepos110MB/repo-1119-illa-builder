@@ -40,6 +40,8 @@ import {
   isShowDot,
 } from "@/redux/config/configSelector"
 import { configActions } from "@/redux/config/configSlice"
+import { updateCurrentAllComponentsAttachedUsers } from "@/redux/currentApp/collaborators/collaboratorsHandlers"
+import { getComponentAttachUsers } from "@/redux/currentApp/collaborators/collaboratorsSelector"
 import { getFlattenArrayComponentNodes } from "@/redux/currentApp/editor/components/componentsSelector"
 import { componentsActions } from "@/redux/currentApp/editor/components/componentsSlice"
 import { ComponentNode } from "@/redux/currentApp/editor/components/componentsState"
@@ -99,6 +101,7 @@ export const ScaleSquare = memo<ScaleSquareProps>((props: ScaleSquareProps) => {
   const dispatch = useDispatch()
 
   const isShowCanvasDot = useSelector(isShowDot)
+  const componentsAttachedUsers = useSelector(getComponentAttachUsers)
   const illaMode = useSelector(getIllaMode)
   const errors = useSelector(getExecutionError)
   const selectedComponents = useSelector(getSelectedComponents)
@@ -175,17 +178,24 @@ export const ScaleSquare = memo<ScaleSquareProps>((props: ScaleSquareProps) => {
         )
         if (index !== -1) {
           currentSelectedDisplayName.splice(index, 1)
-          dispatch(
-            configActions.updateSelectedComponent(currentSelectedDisplayName),
-          )
         } else {
           currentSelectedDisplayName.push(componentNode.displayName)
-          dispatch(
-            configActions.updateSelectedComponent(currentSelectedDisplayName),
-          )
         }
+        dispatch(
+          configActions.updateSelectedComponent(currentSelectedDisplayName),
+        )
+        updateCurrentAllComponentsAttachedUsers(
+          currentSelectedDisplayName,
+          componentsAttachedUsers,
+        )
+
         return
       }
+      updateCurrentAllComponentsAttachedUsers(
+        [componentNode.displayName],
+        componentsAttachedUsers,
+      )
+
       dispatch(
         configActions.updateSelectedComponent([componentNode.displayName]),
       )
@@ -440,6 +450,10 @@ export const ScaleSquare = memo<ScaleSquareProps>((props: ScaleSquareProps) => {
       dispatch(
         configActions.updateSelectedComponent([componentNode.displayName]),
       )
+      updateCurrentAllComponentsAttachedUsers(
+        [componentNode.displayName],
+        componentsAttachedUsers,
+      )
     },
     [componentNode.displayName, dispatch],
   )
@@ -622,6 +636,7 @@ export const ScaleSquareOnlyHasResize = (props: ScaleSquareProps) => {
   const illaMode = useSelector(getIllaMode)
   const errors = useSelector(getExecutionError)
   const selectedComponents = useSelector(getSelectedComponents)
+  const componentsAttachedUsers = useSelector(getComponentAttachUsers)
 
   const childNodesRef = useRef<ComponentNode[]>(childrenNode || [])
 
@@ -662,19 +677,25 @@ export const ScaleSquareOnlyHasResize = (props: ScaleSquareProps) => {
         )
         if (index !== -1) {
           currentSelectedDisplayName.splice(index, 1)
-          dispatch(
-            configActions.updateSelectedComponent(currentSelectedDisplayName),
-          )
         } else {
           currentSelectedDisplayName.push(componentNode.displayName)
-          dispatch(
-            configActions.updateSelectedComponent(currentSelectedDisplayName),
-          )
         }
+        dispatch(
+          configActions.updateSelectedComponent(currentSelectedDisplayName),
+        )
+
+        updateCurrentAllComponentsAttachedUsers(
+          currentSelectedDisplayName,
+          componentsAttachedUsers,
+        )
         return
       }
       dispatch(
         configActions.updateSelectedComponent([componentNode.displayName]),
+      )
+      updateCurrentAllComponentsAttachedUsers(
+        [componentNode.displayName],
+        componentsAttachedUsers,
       )
     },
     [componentNode.displayName, dispatch, illaMode, selectedComponents],
@@ -833,9 +854,14 @@ export const ScaleSquareOnlyHasResize = (props: ScaleSquareProps) => {
       dispatch(
         configActions.updateSelectedComponent([componentNode.displayName]),
       )
+      updateCurrentAllComponentsAttachedUsers(
+        [componentNode.displayName],
+        componentsAttachedUsers,
+      )
     },
     [componentNode.displayName, dispatch],
   )
+
   return (
     <Resizable
       bounds="parent"

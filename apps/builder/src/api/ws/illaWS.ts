@@ -61,11 +61,21 @@ export class ILLAWebsocket {
         console.log(`[WS OPENED](${this.url}) connection succeeded`)
         store.dispatch(configActions.updateDevicesOnlineStatusReducer(true))
         this.send(
-          getPayload(Signal.SIGNAL_ENTER, Target.TARGET_NOTHING, false, null, [
+          getPayload(
+            Signal.SIGNAL_ENTER,
+            Target.TARGET_NOTHING,
+            false,
             {
-              authToken: getLocalStorage("token"),
+              // 需要增加广播信息, 注意, 一定要设置, 否则不广播
+              type: "enter",
+              payload: [],
             },
-          ]),
+            [
+              {
+                authToken: getLocalStorage("token"),
+              },
+            ],
+          ),
         )
         this.isOnline = true
         this.repeat = 0

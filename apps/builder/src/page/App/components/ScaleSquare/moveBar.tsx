@@ -1,6 +1,7 @@
-import { FC, useMemo } from "react"
+import { FC, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
+import useMeasure from "react-use-measure"
 import {
   DragIcon,
   LockIcon,
@@ -10,6 +11,7 @@ import {
 } from "@illa-design/react"
 import { Trigger } from "@illa-design/react"
 import { ReactComponent as DocIcon } from "@/assets/doc.svg"
+import { CollaboratorsList } from "@/page/App/components/ScaleSquare/CollaboratorsList"
 import {
   MoveBarPositionShape,
   MoveBarProps,
@@ -17,6 +19,7 @@ import {
 import {
   MOVE_BAR_HEIGHT,
   applyMoveBarWrapperStyle,
+  displayNameContainerStyle,
   docIconStyle,
   docTipsWrapperStyle,
   dragPointIconWrapperStyle,
@@ -26,6 +29,8 @@ import {
   warningStyle,
 } from "@/page/App/components/ScaleSquare/style"
 import { getFreezeState } from "@/redux/config/configSelector"
+import { getComponentAttachUsers } from "@/redux/currentApp/collaborators/collaboratorsSelector"
+import { CollaboratorsInfo } from "@/redux/currentApp/collaborators/collaboratorsState"
 
 interface WidgetDocProps {
   widgetType: string
@@ -72,9 +77,26 @@ export const MoveBar: FC<MoveBarProps> = (props) => {
     widgetType,
   } = props
 
-  const { t } = useTranslation()
+  const componentsAttachedUsers = useSelector(
+    getComponentAttachUsers,
+  ) as Record<string, CollaboratorsInfo[]>
+  const attachedUserList = componentsAttachedUsers[displayName] || []
 
+  const { t } = useTranslation()
   const isFreezeCanvas = useSelector(getFreezeState)
+  const [currentState, setCurrentState] = useState<string>("right")
+  const [containerRef, bounds] = useMeasure()
+  const containerWidthRef = useRef(0)
+
+  useEffect(() => {
+    if (bounds.width > containerWidthRef.current) {
+      currentState !== "right" && setCurrentState("right")
+    }
+    if (bounds.width < containerWidthRef.current) {
+      currentState !== "left" && setCurrentState("left")
+    }
+    containerWidthRef.current = bounds.width
+  }, [bounds.width, currentState])
 
   const position: MoveBarPositionShape = useMemo(() => {
     if (widgetTop + containerPadding >= MOVE_BAR_HEIGHT) {
@@ -97,10 +119,21 @@ export const MoveBar: FC<MoveBarProps> = (props) => {
       position: 0,
     }
   }, [containerHeight, containerPadding, widgetHeight, widgetTop])
+
+  const minWidth =
+    attachedUserList.length >= 3
+      ? 48
+      : attachedUserList.length * 14 +
+          (attachedUserList.length || 1 - 1) * 4 +
+          12 || 12
+
+  const disableMargin = bounds.width <= (attachedUserList.length >= 2 ? 48 : 34)
+
   return (
     <div
       css={applyMoveBarWrapperStyle(
         maxWidth,
+        minWidth,
         isError,
         selected,
         isEditor,
@@ -108,6 +141,7 @@ export const MoveBar: FC<MoveBarProps> = (props) => {
         isFreezeCanvas,
       )}
       id="moveBar"
+      ref={containerRef}
     >
       {isFreezeCanvas ? (
         <>
@@ -116,8 +150,18 @@ export const MoveBar: FC<MoveBarProps> = (props) => {
         </>
       ) : (
         <>
-          <DragIcon css={dragPointIconWrapperStyle} />
-          <span css={moveBarDisplayNameStyle}>{displayName}</span>
+          <div css={displayNameContainerStyle}>
+            <DragIcon css={dragPointIconWrapperStyle} />
+            <span css={moveBarDisplayNameStyle}>{displayName}</span>
+          </div>
+          {selected && (
+            <CollaboratorsList
+              users={attachedUserList}
+              disableMargin={disableMargin}
+              currentState={currentState}
+              containerWidth={bounds.width}
+            />
+          )}
         </>
       )}
       {isError && (

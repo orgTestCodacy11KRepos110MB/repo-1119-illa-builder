@@ -272,6 +272,7 @@ export function applyBarHandlerStyle(
 
 export const applyMoveBarWrapperStyle = (
   maxWidth: number,
+  minWidth: number,
   isError: boolean,
   selected: boolean,
   isEditor: boolean,
@@ -315,13 +316,19 @@ export const applyMoveBarWrapperStyle = (
     font-size: 12px;
     color: #fff;
     max-width: ${maxWidth}px;
-    min-width: 12px;
-    overflow: hidden;
+    min-width: ${minWidth}px;
+    //overflow: hidden;
     visibility: ${isEditor && selected ? "visible" : "hidden"};
     z-index: 100;
     cursor: move;
   `
 }
+
+export const displayNameContainerStyle = css`
+  display: flex;
+  min-width: 12px;
+  flex-grow: 1;
+`
 
 export const dragPointIconWrapperStyle = css`
   width: 12px;
