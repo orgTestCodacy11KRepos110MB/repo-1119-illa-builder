@@ -23,12 +23,7 @@ import {
   isOpenRightPanel,
 } from "@/redux/config/configSelector"
 import { setupActionListeners } from "@/redux/currentApp/action/actionListener"
-import {
-  getComponentAttachUsers,
-  getCurrentAppAttachUsers,
-} from "@/redux/currentApp/collaborators/collaboratorsSelector"
 import { collaboratorsActions } from "@/redux/currentApp/collaborators/collaboratorsSlice"
-import { CollaboratorsInfo } from "@/redux/currentApp/collaborators/collaboratorsState"
 import { setupComponentsListeners } from "@/redux/currentApp/editor/components/componentsListener"
 import { setupExecutionListeners } from "@/redux/currentApp/executionTree/executionListener"
 import { getCurrentUser } from "@/redux/currentUser/currentUserSelector"
@@ -76,6 +71,11 @@ export const Editor: FC = () => {
     }
     return () => {
       handleLeaveRoom()
+      dispatch(
+        collaboratorsActions.setInRoomUsers({
+          inRoomUsers: [],
+        }),
+      )
       window.removeEventListener("beforeunload", handleLeaveRoom)
     }
   }, [currentUser, appId])
